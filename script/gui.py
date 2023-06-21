@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
 import pandas
-from auto.logic import processar_arquivo
+from logic import processar_arquivo
 from pathlib import Path
 
 
