@@ -2,7 +2,7 @@ import pandas as pd
 import re
 from pathlib import Path
 import unidecode
-
+import csv
 
 def get_desktop_path():
     return str(Path.home() / "Desktop")
@@ -10,6 +10,22 @@ def get_desktop_path():
 
 def processar_arquivo(arquivo_csv):
     try:
+        
+        # Abrir o arquivo CSV em modo de leitura
+        with open(arquivo_csv, 'r') as arquivo:
+            leitor_csv = csv.reader(arquivo)
+            linhas = list(leitor_csv)
+
+        # Verificar se a primeira linha não possui os campos "number" e "name"
+        if linhas[0] != ['number', 'name']:
+            # Insere a nova linha com os campos "number" e "name"
+            linhas.insert(0, ['number', 'name'])
+
+            # Salvar o arquivo corrigido
+            with open(arquivo_csv, 'w', newline='') as arquivo_corrigido:
+                escritor_csv = csv.writer(arquivo_corrigido)
+                escritor_csv.writerows(linhas)
+
         # Ler o arquivo CSV
         df = pd.read_csv(arquivo_csv)
         
@@ -40,7 +56,7 @@ def processar_arquivo(arquivo_csv):
         # Verificar e remover o quinto dígito dos números de telefone
         for index, row in df.iterrows():
             numero_telefone = str(row['number'])
-            ddd = int(numero_telefone[2:4])
+            ddd = int(numero_telefone[2:4]) if re.match(r'^\d+$', numero_telefone[2:4]) else 0
 
             if ddd > 29 and len(numero_telefone) >= 5:
                 # Remover o quinto dígito
